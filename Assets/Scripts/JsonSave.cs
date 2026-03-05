@@ -5,6 +5,18 @@ using System.IO;
 using TMPro;
 using System.Runtime.InteropServices;
 
+[System.Serializable]
+public class PlayerData
+{
+    public int currentLevel;
+    public int attempts;    
+    public int points;
+    public int misses;
+    public int omissions;
+    public int tips;
+    public float gameTime;
+}
+
 public class JsonSave : MonoBehaviour
 {
     public static JsonSave main;
@@ -12,78 +24,61 @@ public class JsonSave : MonoBehaviour
 
     [DllImport("__Internal")] static extern void SavePlayerData(string jsonData, string mainJson);
 
-    TowerProjectileItemArray dataWeb;
+    PlayerData dataWeb;
 
     void Awake()
     {
-        main = this;
-    }
-
-    void Start()
-    {
-        TowerProjectileItemArray projectileArray = LoadFileProjectileArray();
-        List<PurchasedProjectiles> newPurchasedProjectiles = new List<PurchasedProjectiles>();
-        List<TowerProjectileItem> towerProjectileItems = new List<TowerProjectileItem>();
-        List<ResourcesItem> resourceItems = new List<ResourcesItem>();
-
-        if (projectileArray == null)
+        if (main == null)
         {
-            resourceItems.Add(new ResourcesItem(0, "Bamboo"));
-            resourceItems.Add(new ResourcesItem(0, "Crystal"));
-            resourceItems.Add(new ResourcesItem(0, "Fang"));
-            resourceItems.Add(new ResourcesItem(0, "Feather"));
-
-            SaveProjectileArray(towerProjectileItems.ToArray(), resourceItems.ToArray(), newPurchasedProjectiles.ToArray(), 0);
+            main = this;
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 
     public void ResetFileProjectileArray()
     {
-        TowerProjectileItemArray projectileArray = LoadFileProjectileArray();
-        List<PurchasedProjectiles> newPurchasedProjectiles = new List<PurchasedProjectiles>();
-        List<TowerProjectileItem> towerProjectileItems = new List<TowerProjectileItem>();
-        List<ResourcesItem> resourceItems = new List<ResourcesItem>();
+        PlayerData playerData = LoadPlayerData();
 
-        resourceItems.Add(new ResourcesItem(0, "Bamboo"));
-        resourceItems.Add(new ResourcesItem(0, "Crystal"));
-        resourceItems.Add(new ResourcesItem(0, "Fang"));
-        resourceItems.Add(new ResourcesItem(0, "Feather"));
-
-        SaveProjectileArray(towerProjectileItems.ToArray(), resourceItems.ToArray(), newPurchasedProjectiles.ToArray(), 0);
+        SaveProjectileArray(0, 0, 0, 0, 0, 0, 0f);
         PlayerPrefs.DeleteAll();
     }
 
-    public void FirstSaveProjectileArray()
+    public void SaveProjectileArray(
+        int _currentLevel, 
+        int _attempts, 
+        int _points, 
+        int _misses, 
+        int _omissions,
+        int _tips,
+        float _gameTime
+    )
     {
-        TowerProjectileItemArray projectileArray = LoadFileProjectileArray();
-        SaveProjectileArray(projectileArray.items, projectileArray.resources, projectileArray.purchasedProjectiles, projectileArray.currentLevel);
-    }
+        PlayerData wrapper = new PlayerData 
+        { 
+            currentLevel = _currentLevel, 
+            attempts = _attempts, 
+            points = _points, 
+            misses = _misses,
+            omissions = _omissions,
+            tips = _tips,
+            gameTime = _gameTime,
+        };
 
-    public void SaveProjectileArray(TowerProjectileItem[] array, ResourcesItem[] resourcesArray, PurchasedProjectiles[] purchasedProjectilesArray, int _currentLevel)
-    {
-        TowerProjectileItemArray wrapper = new TowerProjectileItemArray { currentLevel = _currentLevel, resources = resourcesArray, items = array, purchasedProjectiles = purchasedProjectilesArray };
         string json = JsonUtility.ToJson(wrapper);
         string path = Path.Combine(Application.persistentDataPath, "playerData.json");
 
         File.WriteAllText(path, json);
-
-        if (GamePushManager.main != null)
-        {
-            GamePushManager.main.SetPlayerProgress(json);
-        }
-        else
-        {
-            #if UNITY_WEBGL
-                SavePlayerData(json, mainJson);
-            #endif
-        }
+        SavePlayerData(json, mainJson);
     }
 
-    public TowerProjectileItemArray LoadFileProjectileArray()
+    public PlayerData LoadPlayerData()
     {
         if (!string.IsNullOrEmpty(mainJson))
         {
-            dataWeb = JsonUtility.FromJson<TowerProjectileItemArray>(mainJson);
+            dataWeb = JsonUtility.FromJson<PlayerData>(mainJson);
             return dataWeb != null ? dataWeb : null;
         }
         else
@@ -93,18 +88,7 @@ public class JsonSave : MonoBehaviour
             if (File.Exists(path))
             {
                 string json = File.ReadAllText(path);
-
-                if (GamePushManager.main != null)
-                {
-                    string loadedProgress = GamePushManager.main.GetPlayerProgress();
-
-                    if (loadedProgress != "0" && loadedProgress != "")
-                    {
-                        json = loadedProgress;
-                    }
-                }
-
-                TowerProjectileItemArray data = JsonUtility.FromJson<TowerProjectileItemArray>(json);
+                PlayerData data = JsonUtility.FromJson<PlayerData>(json);
 
                 return data != null ? data : null;
             }
