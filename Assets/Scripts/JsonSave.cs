@@ -20,11 +20,7 @@ public class PlayerData
 public class JsonSave : MonoBehaviour
 {
     public static JsonSave main;
-    public string mainJson = "";
-
-    [DllImport("__Internal")] static extern void SavePlayerData(string jsonData, string mainJson);
-
-    PlayerData dataWeb;
+    
 
     void Awake()
     {
@@ -41,12 +37,11 @@ public class JsonSave : MonoBehaviour
     public void ResetFileProjectileArray()
     {
         PlayerData playerData = LoadPlayerData();
-
-        SaveProjectileArray(0, 0, 0, 0, 0, 0, 0f);
+        SavePlayerData(0, 0, 0, 0, 0, 0, 0f);
         PlayerPrefs.DeleteAll();
     }
 
-    public void SaveProjectileArray(
+    public void SavePlayerData(
         int _currentLevel, 
         int _attempts, 
         int _points, 
@@ -71,31 +66,22 @@ public class JsonSave : MonoBehaviour
         string path = Path.Combine(Application.persistentDataPath, "playerData.json");
 
         File.WriteAllText(path, json);
-        SavePlayerData(json, mainJson);
     }
 
     public PlayerData LoadPlayerData()
     {
-        if (!string.IsNullOrEmpty(mainJson))
+        string path = Path.Combine(Application.persistentDataPath, "playerData.json");
+
+        if (File.Exists(path))
         {
-            dataWeb = JsonUtility.FromJson<PlayerData>(mainJson);
-            return dataWeb != null ? dataWeb : null;
+            string json = File.ReadAllText(path);
+            PlayerData data = JsonUtility.FromJson<PlayerData>(json);
+
+            return data != null ? data : null;
         }
-        else
+        else  
         {
-            string path = Path.Combine(Application.persistentDataPath, "playerData.json");
-
-            if (File.Exists(path))
-            {
-                string json = File.ReadAllText(path);
-                PlayerData data = JsonUtility.FromJson<PlayerData>(json);
-
-                return data != null ? data : null;
-            }
-            else  
-            {
-                return null;
-            }   
+            return null;
         }
     }
 }
