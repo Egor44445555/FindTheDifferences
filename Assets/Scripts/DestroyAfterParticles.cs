@@ -32,7 +32,7 @@ public class DestroyAfterParticles : MonoBehaviour
     {
         if (particleSystem != null && !particleSystem.IsAlive())
         {
-            // Destroy(gameObject);
+            Destroy(gameObject);
         }
     }
 

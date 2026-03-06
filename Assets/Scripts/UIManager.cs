@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
@@ -9,7 +11,7 @@ public class UIManager : MonoBehaviour
     
     [SerializeField] float collectionRadius = 0.1f;
     [SerializeField] LayerMask itemLayer;
-    [SerializeField] string itemTag = "Cat";
+    [SerializeField] string itemTag = "Tag";
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject successMenu;
     [SerializeField] public GameObject soundIcon;
@@ -17,12 +19,22 @@ public class UIManager : MonoBehaviour
     [SerializeField] public AudioSource music;
     [SerializeField] public AudioSource effect;
 
+    [Header("Additional components")]
+    [SerializeField] GameObject successCheckIcon;
+    [SerializeField] GameObject successCheckEffect;
+    [SerializeField] GameObject reward;
+    [SerializeField] GameObject errorCross;
+
     Camera cam;
-    int searchCount = 0;
-    int maxSearchCount = 0;
     int currentLevel = 0;
     bool gamePause = false;
     int maxLevel = 2;
+    int currentClick = 0;
+    UIDifference[] UIDifferences;
+    UIDifference currentUIDifference;
+    Vector2 startPoint = new Vector2();
+    float timer = 0f;
+    bool endLevel = false;
 
     void Awake()
     {
@@ -49,16 +61,36 @@ public class UIManager : MonoBehaviour
         {
             music.Play();
         }
+                
+        List<UIDifference> differenceList = new List<UIDifference>(FindObjectsOfType<UIDifference>());
+        differenceList.Sort((a, b) => a.GetSerialNumber().CompareTo(b.GetSerialNumber()));
+        UIDifferences = differenceList.ToArray();
     }
 
     void Update()
     {
+        if (endLevel)
+        {
+            timer += Time.deltaTime;
+        }
+
+        if (timer > 1f)
+        {
+            StartCoroutine(SuccessLevel());
+            endLevel = false;
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tab))
         {
             TogglePause();
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonDown(0))
+        {
+            startPoint = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f)
         {
             HandleMouseClick();
         }
@@ -107,6 +139,7 @@ public class UIManager : MonoBehaviour
 
     void HandleMouseClick()
     {
+        bool match = false;
         Vector3 worldPosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));        
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(worldPosition, collectionRadius, itemLayer);
         
@@ -114,19 +147,40 @@ public class UIManager : MonoBehaviour
         {
             if (hitCollider.CompareTag(itemTag))
             {
-                if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0" && maxSearchCount >= searchCount)
+                match = true;      
+                hitCollider.GetComponent<Difference>().Catch();
+
+                if (reward != null)
+                {
+                    print("reward");
+                    
+                    GameObject rewardObject = Instantiate(reward, worldPosition, Quaternion.identity);
+                    IconSuccess rewardComponent = rewardObject.GetComponent<IconSuccess>();
+                    rewardComponent.SetTarget(UIDifferences[currentClick], true);
+                }
+
+                if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0")
                 {
                     effect.Play();
                 }
-                
-                searchCount++;
-
-                if (maxSearchCount <= searchCount)
-                {
-                    StartCoroutine(SuccessLevel());
-                }
             }
         }
+
+        if (!match && errorCross != null && UIDifferences.Length > currentClick)
+        {
+            print("Miss");
+
+            GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
+            IconSuccess crossComponent = crossObject.GetComponent<IconSuccess>();
+            crossComponent.SetTarget(UIDifferences[currentClick], false);
+        }
+
+        if (UIDifferences.Length - 1 == currentClick)
+        {
+            endLevel = true;
+        }
+
+        currentClick++;
     }
 
     IEnumerator SuccessLevel()
@@ -139,12 +193,7 @@ public class UIManager : MonoBehaviour
             successMenu.SetActive(true);
         }
         
-        PlayerPrefs.SetInt("CurrentLevel", currentLevel + 1);
-    }
-
-    public void IncreaseMaxSearchCount()
-    {
-        maxSearchCount++;
+        // PlayerPrefs.SetInt("CurrentLevel", currentLevel + 1);
     }
 
     public bool IsGamePause()
@@ -213,5 +262,15 @@ public class UIManager : MonoBehaviour
     public void ExitGame()
     {
         Application.Quit();
+    }
+
+    public GameObject GetSuccessCheckIcon()
+    {
+        return successCheckIcon;
+    }
+
+    public GameObject GetSuccessCheckEffect()
+    {
+        return successCheckEffect;
     }
 }
