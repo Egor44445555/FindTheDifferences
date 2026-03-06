@@ -150,14 +150,12 @@ public class UIManager : MonoBehaviour
                 match = true;      
                 hitCollider.GetComponent<Difference>().Catch();
 
-                if (reward != null)
-                {
-                    print("reward");
-                    
-                    GameObject rewardObject = Instantiate(reward, worldPosition, Quaternion.identity);
-                    IconSuccess rewardComponent = rewardObject.GetComponent<IconSuccess>();
-                    rewardComponent.SetTarget(UIDifferences[currentClick], true);
-                }
+                // if (reward != null)
+                // {                    
+                //     GameObject rewardObject = Instantiate(reward, worldPosition, Quaternion.identity);
+                //     IconSuccess rewardComponent = rewardObject.GetComponent<IconSuccess>();
+                //     rewardComponent.SetTarget(UIDifferences[currentClick], true);
+                // }
 
                 if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0")
                 {
@@ -168,8 +166,6 @@ public class UIManager : MonoBehaviour
 
         if (!match && errorCross != null && UIDifferences.Length > currentClick)
         {
-            print("Miss");
-
             GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
             IconSuccess crossComponent = crossObject.GetComponent<IconSuccess>();
             crossComponent.SetTarget(UIDifferences[currentClick], false);
@@ -181,6 +177,11 @@ public class UIManager : MonoBehaviour
         }
 
         currentClick++;
+    }
+
+    public GameObject GetRewardObject()
+    {
+        return reward;
     }
 
     IEnumerator SuccessLevel()
