@@ -1,8 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using TMPro;
 using System.Runtime.InteropServices;
 
 [System.Serializable]
@@ -14,7 +14,6 @@ public class PlayerData
     public int misses;
     public int omissions;
     public int tips;
-    public float gameTime;
 }
 
 public class JsonSave : MonoBehaviour
@@ -36,52 +35,62 @@ public class JsonSave : MonoBehaviour
 
     public void ResetFileProjectileArray()
     {
-        PlayerData playerData = LoadPlayerData();
-        SavePlayerData(0, 0, 0, 0, 0, 0, 0f);
+        PlayerData playerData = JsonSave.LoadData<PlayerData>("playerData");
+
+        playerData.currentLevel = 0;
+        playerData.attempts = 0;
+        playerData.points = 0;
+        playerData.misses = 0;
+        playerData.omissions = 0;
+        playerData.tips = 0;
+
+        SaveData(playerData, "PlayerData");
         PlayerPrefs.DeleteAll();
     }
 
-    public void SavePlayerData(
-        int _currentLevel, 
-        int _attempts, 
-        int _points, 
-        int _misses, 
-        int _omissions,
-        int _tips,
-        float _gameTime
-    )
+    public static bool SaveData<T>(T data, string fileName)
     {
-        PlayerData wrapper = new PlayerData 
-        { 
-            currentLevel = _currentLevel, 
-            attempts = _attempts, 
-            points = _points, 
-            misses = _misses,
-            omissions = _omissions,
-            tips = _tips,
-            gameTime = _gameTime,
-        };
+        try
+        {
+            string json = JsonUtility.ToJson(data, true);
+            string path = GetSavePath(fileName);
 
-        string json = JsonUtility.ToJson(wrapper);
-        string path = Path.Combine(Application.persistentDataPath, "playerData.json");
-
-        File.WriteAllText(path, json);
+            File.WriteAllText(path, json);
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 
-    public PlayerData LoadPlayerData()
+    public static T LoadData<T>(string fileName) where T : new()
     {
-        string path = Path.Combine(Application.persistentDataPath, "playerData.json");
-
-        if (File.Exists(path))
+        try
         {
-            string json = File.ReadAllText(path);
-            PlayerData data = JsonUtility.FromJson<PlayerData>(json);
+            string path = GetSavePath(fileName);
 
-            return data != null ? data : null;
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                return JsonUtility.FromJson<T>(json);
+            }
+
+            return new T();
         }
-        else  
+        catch (Exception e)
         {
-            return null;
+            return new T();
         }
+    }
+
+    static string GetSavePath(string fileName)
+    {
+        if (!fileName.EndsWith(".json"))
+        {
+            fileName += ".json";
+        }
+
+        return Path.Combine(Application.persistentDataPath, fileName);
     }
 }

@@ -104,4 +104,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5adf1b9bca6bd874fbd1ef165d924e9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CrossMiss
-  moveSpeed: 400
+  moveSpeed: 100

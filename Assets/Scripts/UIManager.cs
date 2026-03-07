@@ -31,10 +31,10 @@ public class UIManager : MonoBehaviour
     int maxLevel = 2;
     int currentClick = 0;
     UIDifference[] UIDifferences;
-    UIDifference currentUIDifference;
     Vector2 startPoint = new Vector2();
     float timer = 0f;
     bool endLevel = false;
+    PlayerData playerData;
 
     void Awake()
     {
@@ -50,8 +50,13 @@ public class UIManager : MonoBehaviour
     
     void Start()
     {
-        cam = Camera.main;
-        currentLevel = PlayerPrefs.GetInt("CurrentLevel");
+        if (JsonSave.main != null)
+        {
+            playerData = JsonSave.LoadData<PlayerData>("playerData");
+            currentLevel = playerData.currentLevel;
+        }
+        
+        cam = Camera.main; 
 
         if (music != null && PlayerPrefs.GetString("SoundEnable") == "0")
         {
@@ -90,7 +95,7 @@ public class UIManager : MonoBehaviour
             startPoint = Input.mousePosition;
         }
 
-        if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f)
+        if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f && !gamePause)
         {
             HandleMouseClick();
         }
@@ -142,6 +147,11 @@ public class UIManager : MonoBehaviour
         bool match = false;
         Vector3 worldPosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));        
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(worldPosition, collectionRadius, itemLayer);
+
+        if (JsonSave.main != null)
+        {
+            playerData = JsonSave.LoadData<PlayerData>("playerData");
+        }
         
         foreach (var hitCollider in hitColliders)
         {
@@ -149,13 +159,8 @@ public class UIManager : MonoBehaviour
             {
                 match = true;      
                 hitCollider.GetComponent<Difference>().Catch();
-
-                // if (reward != null)
-                // {                    
-                //     GameObject rewardObject = Instantiate(reward, worldPosition, Quaternion.identity);
-                //     IconSuccess rewardComponent = rewardObject.GetComponent<IconSuccess>();
-                //     rewardComponent.SetTarget(UIDifferences[currentClick], true);
-                // }
+                playerData.attempts += 1;
+                playerData.points += 350;
 
                 if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0")
                 {
@@ -169,6 +174,7 @@ public class UIManager : MonoBehaviour
             GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
             IconSuccess crossComponent = crossObject.GetComponent<IconSuccess>();
             crossComponent.SetTarget(UIDifferences[currentClick], false);
+            playerData.misses += 1;
         }
 
         if (UIDifferences.Length - 1 == currentClick)
@@ -177,11 +183,26 @@ public class UIManager : MonoBehaviour
         }
 
         currentClick++;
+
+        if (JsonSave.main != null)
+        {
+            JsonSave.SaveData(playerData, "PlayerData");
+        }        
     }
 
     public GameObject GetRewardObject()
     {
         return reward;
+    }
+    
+    public UIDifference[] GetUIDifferences()
+    {
+        return UIDifferences;
+    }
+
+    public int GetCurrentClick()
+    {
+        return currentClick;
     }
 
     IEnumerator SuccessLevel()
@@ -192,9 +213,7 @@ public class UIManager : MonoBehaviour
         if (successMenu != null)
         {
             successMenu.SetActive(true);
-        }
-        
-        // PlayerPrefs.SetInt("CurrentLevel", currentLevel + 1);
+        }        
     }
 
     public bool IsGamePause()
@@ -250,7 +269,13 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            PlayerPrefs.SetInt("CurrentLevel", 0);
+            playerData.currentLevel = 0;
+
+            if (JsonSave.main != null)
+            {
+                JsonSave.SaveData(playerData, "PlayerData");
+            }
+            
             ToMenu();
         }
     }

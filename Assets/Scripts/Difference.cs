@@ -17,11 +17,13 @@ public class Difference : MonoBehaviour
 
                 if (UIManager.main != null)
                 {
-                    Instantiate(UIManager.main.GetRewardObject(), transform.position, Quaternion.identity);
+                    GameObject rewardObject = Instantiate(UIManager.main.GetRewardObject(), transform.position, Quaternion.identity);
+                    IconSuccess rewardComponent = rewardObject.GetComponent<IconSuccess>();
 
-                    // GameObject rewardObject = Instantiate(reward, worldPosition, Quaternion.identity);
-                    // IconSuccess rewardComponent = rewardObject.GetComponent<IconSuccess>();
-                    // rewardComponent.SetTarget(UIDifferences[currentClick], true);
+                    if (UIManager.main != null)
+                    {
+                        rewardComponent.SetTarget(UIManager.main.GetUIDifferences()[UIManager.main.GetCurrentClick()], true);
+                    }                    
                 }
 
                 if (linkedObject != null)
