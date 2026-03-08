@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,18 +15,22 @@ public class UIManager : MonoBehaviour
     [SerializeField] string itemTag = "Tag";
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject successMenu;
-    [SerializeField] public GameObject soundIcon;
-    [SerializeField] public GameObject sounIconDisabled;
-    [SerializeField] public AudioSource music;
-    [SerializeField] public AudioSource effect;
+    [SerializeField] GameObject soundIcon;
+    [SerializeField] GameObject sounIconDisabled;
+    [SerializeField] AudioSource music;
+    [SerializeField] AudioSource effect;
 
     [Header("Additional components")]
     [SerializeField] GameObject successCheckIcon;
     [SerializeField] GameObject successCheckEffect;
+    [SerializeField] GameObject HintEffect;
     [SerializeField] GameObject reward;
     [SerializeField] GameObject errorCross;
 
     Camera cam;
+    GraphicRaycaster graphicRaycaster;
+    PointerEventData pointerEventData;
+    EventSystem eventSystem;
     int currentLevel = 0;
     bool gamePause = false;
     int maxLevel = 2;
@@ -35,6 +40,7 @@ public class UIManager : MonoBehaviour
     float timer = 0f;
     bool endLevel = false;
     PlayerData playerData;
+    bool allowClick = true;
 
     void Awake()
     {
@@ -50,6 +56,9 @@ public class UIManager : MonoBehaviour
     
     void Start()
     {
+        eventSystem = EventSystem.current;
+        graphicRaycaster = FindObjectOfType<GraphicRaycaster>();
+
         if (JsonSave.main != null)
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
@@ -93,9 +102,10 @@ public class UIManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             startPoint = Input.mousePosition;
+            allowClick = !gamePause ? true : false;
         }
 
-        if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f && !gamePause)
+        if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f && !gamePause && !IsTouchOverUI(Input.mousePosition) && allowClick)
         {
             HandleMouseClick();
         }
@@ -147,10 +157,15 @@ public class UIManager : MonoBehaviour
         bool match = false;
         Vector3 worldPosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));        
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(worldPosition, collectionRadius, itemLayer);
-
+        
         if (JsonSave.main != null)
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
+        }
+
+        foreach (var item in FindObjectsOfType<DestroyAfterParticles>())
+        {
+            Destroy(item.gameObject);
         }
         
         foreach (var hitCollider in hitColliders)
@@ -186,7 +201,7 @@ public class UIManager : MonoBehaviour
 
         if (JsonSave.main != null)
         {
-            JsonSave.SaveData(playerData, "PlayerData");
+            JsonSave.SaveData(playerData, "playerData");
         }        
     }
 
@@ -219,6 +234,16 @@ public class UIManager : MonoBehaviour
     public bool IsGamePause()
     {
         return gamePause;
+    }
+
+    public void SetGamePause()
+    {
+        gamePause = true;
+    }
+
+    public void SetUnpauseGame()
+    {
+        gamePause = false;
     }
 
     public void SwitchSound()
@@ -273,7 +298,7 @@ public class UIManager : MonoBehaviour
 
             if (JsonSave.main != null)
             {
-                JsonSave.SaveData(playerData, "PlayerData");
+                JsonSave.SaveData(playerData, "playerData");
             }
             
             ToMenu();
@@ -298,5 +323,54 @@ public class UIManager : MonoBehaviour
     public GameObject GetSuccessCheckEffect()
     {
         return successCheckEffect;
+    }
+
+    public bool IsTouchOverUI(Vector2 _position)
+    {
+        pointerEventData = new PointerEventData(eventSystem) { position = _position };
+        List<RaycastResult> results = new List<RaycastResult>();
+        graphicRaycaster.Raycast(pointerEventData, results);
+        return results.Count > 0;
+    }
+
+    public void GetHint()
+    {
+        foreach (var item in FindObjectsOfType<DestroyAfterParticles>())
+        {
+            Destroy(item.gameObject);
+        }
+
+        foreach (var item in FindObjectsOfType<Difference>())
+        {
+            if (!item.IsActive())
+            {
+                if (JsonSave.main != null)
+                {
+                    playerData = JsonSave.LoadData<PlayerData>("playerData");
+                    playerData.tips += 1;
+                    JsonSave.SaveData(playerData, "playerData");
+                }
+
+                if (HintEffect != null)
+                {
+                    Instantiate(HintEffect, item.transform.position, Quaternion.identity);
+                    Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity);
+                }
+                
+                break;
+            }
+        }
+    }
+
+    public void SkipLevel()
+    {
+        if (JsonSave.main != null)
+        {
+            playerData = JsonSave.LoadData<PlayerData>("playerData");
+            playerData.omissions += 1;
+            JsonSave.SaveData(playerData, "playerData");
+        }
+
+        StartNextLevel();
     }
 }

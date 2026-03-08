@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4925525363574368248}
   - component: {fileID: 4175583397906563466}
-  - component: {fileID: -7814418537273224886}
+  - component: {fileID: 164821129436137590}
   m_Layer: 0
-  m_Name: Reward
+  m_Name: Star
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,8 +28,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -47.67, y: -7.12, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.58, y: 1.58, z: 1.58}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 4b28843938d1c3345b4c09b3f6f41e5a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8cb4df65c6f4a2e499814646147fbc0a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &-7814418537273224886
+--- !u!114 &164821129436137590
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,8 +101,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7281211902900808818}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5adf1b9bca6bd874fbd1ef165d924e9d, type: 3}
+  m_Script: {fileID: 11500000, guid: 67035821dd87a8a4997d7fe51ad43726, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CrossMiss
-  moveSpeed: 100
-  star: {fileID: 7281211902900808818, guid: e42db4f744ab5e44b93b10a712d08356, type: 3}
+  m_EditorClassIdentifier: Assembly-CSharp::Star
+  moveSpeed: 80
+  startMoveSpeed: 5
+  dropOffsetRange: 2

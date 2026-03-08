@@ -20,6 +20,11 @@ public class Popup : MonoBehaviour
         }
         
         popup.SetActive(true);
+
+        if (UIManager.main != null)
+        {
+            UIManager.main.SetGamePause();
+        }
     }
 
     public void ClosePopup()
@@ -30,6 +35,11 @@ public class Popup : MonoBehaviour
         if (CameraTouchMove.main)
         {
             CameraTouchMove.main.cameraMove = true;
+        }
+
+        if (UIManager.main != null)
+        {
+            UIManager.main.SetUnpauseGame();
         }
     }
 }

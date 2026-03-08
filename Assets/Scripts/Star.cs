@@ -1,14 +1,24 @@
 using UnityEngine;
 
-public class IconSuccess : MonoBehaviour
+public class Star : MonoBehaviour
 {
     [SerializeField] float moveSpeed = 80f;
-    [SerializeField] GameObject star;
+    [SerializeField] float startMoveSpeed = 100f;
+    [SerializeField] float dropOffsetRange = 0.3f;
 
     UIDifference target;
     bool goToTarget = false;
     float timer = 0f;
-    bool success = false;
+    float randomTimerGoToTarget = 0f;
+    Vector3 randomOffset;
+    Vector3 startPosition;
+
+    void Start()
+    {
+        randomOffset = new Vector3(Random.Range(-dropOffsetRange, dropOffsetRange), Random.Range(-dropOffsetRange, dropOffsetRange), 0f);
+        startPosition = transform.position + randomOffset;
+        randomTimerGoToTarget = Random.Range(0f, 0.7f);
+    }
 
     void Update()
     {
@@ -16,7 +26,7 @@ public class IconSuccess : MonoBehaviour
         {
             timer += Time.deltaTime;
 
-            if (timer > 0.5f)
+            if (timer > randomTimerGoToTarget + 0.5f)
             {
                 goToTarget = true;
             }
@@ -30,24 +40,17 @@ public class IconSuccess : MonoBehaviour
                         
             if (transform.position == targetPosition)
             {
-                target.CatchHandler(success);
                 Destroy(gameObject);
             }
         }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, startPosition, startMoveSpeed * Time.deltaTime);
+        }
     }
 
-    public void SetTarget(UIDifference _target, bool _success = false)
+    public void SetTarget(UIDifference _target)
     {
         target = _target;
-        success = _success;
-
-        if (star != null)
-        {
-            for (var i = 10; i > 0; i--)
-            {
-                GameObject starObj = Instantiate(star, transform.position, Quaternion.identity);
-                starObj.GetComponent<Star>().SetTarget(_target);
-            }
-        }
     }
 }

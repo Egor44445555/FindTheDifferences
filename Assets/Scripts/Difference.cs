@@ -43,4 +43,14 @@ public class Difference : MonoBehaviour
     {
         activeDifference = true;
     }
+
+    public bool IsActive()
+    {
+        return activeDifference;
+    }
+
+    public GameObject GetLinkedObject()
+    {
+        return linkedObject;
+    }
 }
