@@ -20,7 +20,6 @@ public class JsonSave : MonoBehaviour
 {
     public static JsonSave main;
     
-
     void Awake()
     {
         if (main == null)
@@ -33,7 +32,7 @@ public class JsonSave : MonoBehaviour
         }
     }
 
-    public void ResetFileProjectileArray()
+    public void ResetPlayerData()
     {
         PlayerData playerData = JsonSave.LoadData<PlayerData>("playerData");
 
@@ -46,6 +45,11 @@ public class JsonSave : MonoBehaviour
 
         SaveData(playerData, "PlayerData");
         PlayerPrefs.DeleteAll();
+
+        if (Statistics.main != null)
+        {
+            Statistics.main.CheckStatistics();
+        }
     }
 
     public static bool SaveData<T>(T data, string fileName)

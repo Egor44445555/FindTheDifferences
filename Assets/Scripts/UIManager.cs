@@ -15,7 +15,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] string itemTag = "Tag";
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject successMenu;
-    [SerializeField] GameObject soundIcon;
+    [SerializeField] GameObject failMenu;
     [SerializeField] GameObject sounIconDisabled;
     [SerializeField] AudioSource music;
     [SerializeField] AudioSource effect;
@@ -41,6 +41,9 @@ public class UIManager : MonoBehaviour
     bool endLevel = false;
     PlayerData playerData;
     bool allowClick = true;
+
+    int misses = 0;
+    int successClick = 0;
 
     void Awake()
     {
@@ -88,9 +91,17 @@ public class UIManager : MonoBehaviour
             timer += Time.deltaTime;
         }
 
-        if (timer > 1f)
+        if (timer > 1f && endLevel)
         {
-            StartCoroutine(SuccessLevel());
+            if (successClick > misses)
+            {
+                StartCoroutine(SuccessLevel());
+            }
+            else
+            {
+                StartCoroutine(FailLevel());
+            }
+            
             endLevel = false;
         }
 
@@ -176,6 +187,7 @@ public class UIManager : MonoBehaviour
                 hitCollider.GetComponent<Difference>().Catch();
                 playerData.attempts += 1;
                 playerData.points += 350;
+                successClick += 1;
 
                 if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0")
                 {
@@ -190,6 +202,7 @@ public class UIManager : MonoBehaviour
             IconSuccess crossComponent = crossObject.GetComponent<IconSuccess>();
             crossComponent.SetTarget(UIDifferences[currentClick], false);
             playerData.misses += 1;
+            misses += 1;
         }
 
         if (UIDifferences.Length - 1 == currentClick)
@@ -231,6 +244,17 @@ public class UIManager : MonoBehaviour
         }        
     }
 
+    IEnumerator FailLevel()
+    {
+        yield return new WaitForSeconds(1f);
+        gamePause = true;
+
+        if (failMenu != null)
+        {
+            failMenu.SetActive(true);
+        }        
+    }
+
     public bool IsGamePause()
     {
         return gamePause;
@@ -250,7 +274,6 @@ public class UIManager : MonoBehaviour
     {
         if (PlayerPrefs.GetString("SoundEnable") == "0" || PlayerPrefs.GetString("SoundEnable") == "")
         {
-            soundIcon.SetActive(true);
             sounIconDisabled.SetActive(false);
             PlayerPrefs.SetString("SoundEnable", "1");
 
@@ -261,7 +284,6 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            soundIcon.SetActive(false);
             sounIconDisabled.SetActive(true);
             PlayerPrefs.SetString("SoundEnable", "0");
 
@@ -276,7 +298,6 @@ public class UIManager : MonoBehaviour
     {
         if (PlayerPrefs.GetString("SoundEnable") == "0")
         {
-            soundIcon.SetActive(false);
             sounIconDisabled.SetActive(true);
         }
     }
@@ -290,14 +311,21 @@ public class UIManager : MonoBehaviour
     {
         if ((currentLevel + 1) <= maxLevel)
         {
+            if (JsonSave.main != null)
+            {
+                playerData = JsonSave.LoadData<PlayerData>("playerData");
+                playerData.currentLevel += 1;
+                JsonSave.SaveData(playerData, "playerData");
+            }
+
             SceneManager.LoadSceneAsync("Level" + (currentLevel + 1));
         }
         else
         {
-            playerData.currentLevel = 0;
-
             if (JsonSave.main != null)
             {
+                playerData = JsonSave.LoadData<PlayerData>("playerData");
+                playerData.currentLevel = 0;
                 JsonSave.SaveData(playerData, "playerData");
             }
             

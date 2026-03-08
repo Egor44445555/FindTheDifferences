@@ -3,6 +3,7 @@ using TMPro;
 
 public class Statistics : MonoBehaviour
 {
+    public static Statistics main;
     [SerializeField] TextMeshProUGUI currentLevel;
     [SerializeField] TextMeshProUGUI attempts;
     [SerializeField] TextMeshProUGUI points;
@@ -12,17 +13,29 @@ public class Statistics : MonoBehaviour
 
     PlayerData playerData;
 
+    void Awake()
+    {
+        if (main == null)
+        {
+            main = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         CheckStatistics();
     }
 
-    void OnEnabled()
+    void OnEnable()
     {
         CheckStatistics();
     }
 
-    void CheckStatistics()
+    public void CheckStatistics()
     {
         if (JsonSave.main != null)
         {
