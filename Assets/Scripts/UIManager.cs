@@ -24,6 +24,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject successCheckIcon;
     [SerializeField] GameObject successCheckEffect;
     [SerializeField] GameObject HintEffect;
+    [SerializeField] GameObject successMarker;
     [SerializeField] GameObject reward;
     [SerializeField] GameObject errorCross;
 
@@ -200,7 +201,16 @@ public class UIManager : MonoBehaviour
         {
             GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
             IconSuccess crossComponent = crossObject.GetComponent<IconSuccess>();
-            crossComponent.SetTarget(UIDifferences[currentClick], false);
+            
+            if (crossComponent != null)
+            {
+                crossComponent.SetTarget(UIDifferences[currentClick], false);
+            }
+            else
+            {
+                UIDifferences[currentClick].CatchHandler(false);
+            }
+            
             playerData.misses += 1;
             misses += 1;
         }
@@ -222,6 +232,11 @@ public class UIManager : MonoBehaviour
     {
         return reward;
     }
+
+    public GameObject GetSuccessMarker()
+    {
+        return successMarker;
+    }    
     
     public UIDifference[] GetUIDifferences()
     {
