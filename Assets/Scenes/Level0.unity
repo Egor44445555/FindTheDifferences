@@ -1154,8 +1154,8 @@ Transform:
   m_GameObject: {fileID: 905410482}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16.58, y: -2.41, z: 0}
-  m_LocalScale: {x: 1.5914, y: 1.5914, z: 1.5914}
+  m_LocalPosition: {x: 0, y: 6.47, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5914, z: 1.5914}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1869574355}
@@ -1947,9 +1947,9 @@ Transform:
   m_GameObject: {fileID: 1735999962}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 16.58, y: -2.4099996, z: 0}
-  m_LocalScale: {x: 1.6015, y: 1.6015, z: 1.6015}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: -8.73, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 993559407}
   - {fileID: 53998980}
@@ -2212,6 +2212,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1899124506}
+  - component: {fileID: 1899124507}
   m_Layer: 0
   m_Name: CompareImages
   m_TagString: Untagged
@@ -2236,6 +2237,18 @@ Transform:
   - {fileID: 1735999963}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!156049354 &1899124507
+Grid:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899124505}
+  m_Enabled: 1
+  m_CellSize: {x: 5, y: 5, z: 0}
+  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellLayout: 0
+  m_CellSwizzle: 0
 --- !u!1 &1989616629
 GameObject:
   m_ObjectHideFlags: 0
