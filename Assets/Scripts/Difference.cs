@@ -23,7 +23,7 @@ public class Difference : MonoBehaviour
                     if (UIManager.main != null)
                     {
                         rewardComponent.SetTarget(UIManager.main.GetUIDifferences()[UIManager.main.GetCurrentClick()], true);
-                    }                    
+                    }
                 }
 
                 if (linkedObject != null)

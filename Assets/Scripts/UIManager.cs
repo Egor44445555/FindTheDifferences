@@ -189,6 +189,8 @@ public class UIManager : MonoBehaviour
                 playerData.attempts += 1;
                 playerData.points += 350;
                 successClick += 1;
+                currentClick++;
+                hitCollider.tag = "Untagged";
 
                 if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0")
                 {
@@ -197,20 +199,9 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        if (!match && errorCross != null && UIDifferences.Length > currentClick)
+        if (!match && errorCross != null)
         {
-            GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
-            IconSuccess crossComponent = crossObject.GetComponent<IconSuccess>();
-            
-            if (crossComponent != null)
-            {
-                crossComponent.SetTarget(UIDifferences[currentClick], false);
-            }
-            else
-            {
-                UIDifferences[currentClick].CatchHandler(false);
-            }
-            
+            GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);            
             playerData.misses += 1;
             misses += 1;
         }
@@ -219,9 +210,7 @@ public class UIManager : MonoBehaviour
         {
             endLevel = true;
         }
-
-        currentClick++;
-
+        
         if (JsonSave.main != null)
         {
             JsonSave.SaveData(playerData, "playerData");
@@ -307,14 +296,13 @@ public class UIManager : MonoBehaviour
                 music.Pause();
             }
         }
+
+        CheckSoundIcon();
     }
 
     public void CheckSoundIcon()
     {
-        if (PlayerPrefs.GetString("SoundEnable") == "0")
-        {
-            sounIconDisabled.SetActive(true);
-        }
+        sounIconDisabled.SetActive(PlayerPrefs.GetString("SoundEnable") == "0");
     }
 
     public void StartLevel()

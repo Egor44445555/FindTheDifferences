@@ -8,7 +8,7 @@ public class IconSuccess : MonoBehaviour
     UIDifference target;
     bool goToTarget = false;
     float timer = 0f;
-    bool success = false;
+    bool success = true;
 
     void Update()
     {

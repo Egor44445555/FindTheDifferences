@@ -106,4 +106,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Star
   moveSpeed: 80
   startMoveSpeed: 5
-  dropOffsetRange: 2
+  dropOffsetRange: 0.8
