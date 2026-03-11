@@ -11,10 +11,27 @@ public class UIDifference : MonoBehaviour
 
     bool activeDifference = false;
     Image image;
+    Animator anim;
+    bool isAnimationPlaying = false;
+    string currentAnimation = "Active";
 
     void Start()
     {
         image = GetComponent<Image>();
+        anim = GetComponent<Animator>();  
+    }
+    
+    void Update()
+    {
+        AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        
+        if (stateInfo.IsName("SuccessUIDifference"))
+        {
+            if (stateInfo.normalizedTime >= 1.0f)
+            {
+                anim.SetBool(currentAnimation, false);
+            }
+        }
     }
 
     public void CatchHandler(bool success)
@@ -28,7 +45,9 @@ public class UIDifference : MonoBehaviour
         {
             image.sprite = failBackground;
             failIcon.SetActive(true);
-        }     
+        }
+
+        SuccessAnimate();
         
         activeDifference = true;
     }
@@ -36,5 +55,13 @@ public class UIDifference : MonoBehaviour
     public int GetSerialNumber()
     {
         return serialNumber;
+    }
+
+    public void SuccessAnimate()
+    {
+        if (anim != null)
+        {
+            anim.SetBool(currentAnimation, true);
+        }
     }
 }

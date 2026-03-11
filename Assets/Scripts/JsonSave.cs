@@ -14,6 +14,10 @@ public class PlayerData
     public int misses;
     public int omissions;
     public int tips;
+    public int differences;
+    public float timeDifferences;
+    public float time;
+    public float accuracy;
 }
 
 public class JsonSave : MonoBehaviour
@@ -42,6 +46,10 @@ public class JsonSave : MonoBehaviour
         playerData.misses = 0;
         playerData.omissions = 0;
         playerData.tips = 0;
+        playerData.differences = 0;
+        playerData.timeDifferences = 0;
+        playerData.time = 0;
+        playerData.accuracy = 0;
 
         SaveData(playerData, "PlayerData");
         PlayerPrefs.DeleteAll();

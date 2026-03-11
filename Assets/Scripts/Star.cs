@@ -12,12 +12,15 @@ public class Star : MonoBehaviour
     float randomTimerGoToTarget = 0f;
     Vector3 randomOffset;
     Vector3 startPosition;
+    AudioSource audioSource;
+    bool isDestroy = false;
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         randomOffset = new Vector3(Random.Range(-dropOffsetRange, dropOffsetRange), Random.Range(-dropOffsetRange, dropOffsetRange), 0f);
         startPosition = transform.position + randomOffset;
-        randomTimerGoToTarget = Random.Range(0f, 0.7f);
+        randomTimerGoToTarget = Random.Range(1f, 1.4f);
     }
 
     void Update()
@@ -26,7 +29,7 @@ public class Star : MonoBehaviour
         {
             timer += Time.deltaTime;
 
-            if (timer > randomTimerGoToTarget + 0.5f)
+            if (timer > randomTimerGoToTarget)
             {
                 goToTarget = true;
             }
@@ -38,14 +41,20 @@ public class Star : MonoBehaviour
             targetPosition = new Vector3(targetPosition.x, targetPosition.y, 0f);
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
                         
-            if (transform.position == targetPosition)
+            if (!isDestroy && transform.position == targetPosition && UIManager.main != null && UIManager.main.IsSoundsActive())
             {
-                Destroy(gameObject);
+                audioSource.Play();
+                isDestroy = true;
             }
         }
         else
         {
             transform.position = Vector3.MoveTowards(transform.position, startPosition, startMoveSpeed * Time.deltaTime);
+        }
+
+        if (isDestroy && !audioSource.isPlaying)
+        {
+            Destroy(gameObject);
         }
     }
 

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0f7f146bc58ee0649a723129bc3596f4
+guid: a9b3d8a7212b4b440834f65d04335ae9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1256577582931465693
-    second: SuccessMarker_0
+      213: 8796415493086083684
+    second: HeartFill_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -98,14 +98,14 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: WebGL
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
-    textureFormat: 47
+    textureFormat: -1
     textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
-    overridden: 1
+    overridden: 0
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SuccessMarker_0
+      name: HeartFill_0
       rect:
         serializedVersion: 2
-        x: 30
-        y: 3
-        width: 1162
-        height: 642
+        x: 0
+        y: 0
+        width: 86
+        height: 74
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dd5595f67a2407110800000000000000
-      internalID: 1256577582931465693
+      spriteID: 46a732a1945231a70800000000000000
+      internalID: 8796415493086083684
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      SuccessMarker_0: 1256577582931465693
+      HeartFill_0: 8796415493086083684
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

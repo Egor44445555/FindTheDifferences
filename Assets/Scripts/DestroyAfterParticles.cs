@@ -3,13 +3,11 @@ using UnityEngine;
 public class DestroyAfterParticles : MonoBehaviour
 {
     new ParticleSystem particleSystem;
-    AudioSource audioSource;
 
     void Awake()
     {
         particleSystem = GetComponent<ParticleSystem>();
         particleSystem.Play();
-        audioSource = GetComponent<AudioSource>();
 
         if (particleSystem == null)
         {
@@ -39,6 +37,5 @@ public class DestroyAfterParticles : MonoBehaviour
     void OnDestroy()
     {
         particleSystem = null;
-        audioSource = null;
     }
 }

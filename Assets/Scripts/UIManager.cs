@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
@@ -12,13 +13,15 @@ public class UIManager : MonoBehaviour
     
     [SerializeField] float collectionRadius = 0.1f;
     [SerializeField] LayerMask itemLayer;
-    [SerializeField] string itemTag = "Tag";
+    [SerializeField] string itemTag;
     [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject successMenu;
     [SerializeField] GameObject failMenu;
+    [SerializeField] GameObject hintMenu;
     [SerializeField] GameObject sounIconDisabled;
     [SerializeField] AudioSource music;
     [SerializeField] AudioSource effect;
+    
 
     [Header("Additional components")]
     [SerializeField] GameObject successCheckIcon;
@@ -27,8 +30,14 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject successMarker;
     [SerializeField] GameObject reward;
     [SerializeField] GameObject errorCross;
+    [SerializeField] GameObject heart;
+    [SerializeField] GameObject recoveryHintButton;
+    [SerializeField] GameObject CountHint;
+    [SerializeField] TextMeshProUGUI countHintText;
+    [SerializeField] float recoveryHintTime = 5f;
 
     Camera cam;
+    CameraShake cameraShake;
     GraphicRaycaster graphicRaycaster;
     PointerEventData pointerEventData;
     EventSystem eventSystem;
@@ -44,7 +53,21 @@ public class UIManager : MonoBehaviour
     bool allowClick = true;
 
     int misses = 0;
+    int currentLife = 5;
+    int currentHint = 3;
     int successClick = 0;
+
+    float heartValue = -100f;
+    float stepHeartFill = 0f;
+    RectTransform heartTransform;
+    float heartHeight;
+    Vector2 anchoredPosition;
+    float stepFill = 0f;
+    float currentPositionHeartFill = 0f;
+    bool spendBarHeart = false;
+    bool recoveryHint = false;
+    float recoveryHintTimer = 0f;
+    Image recoveryHintButtonImage;
 
     void Awake()
     {
@@ -62,6 +85,21 @@ public class UIManager : MonoBehaviour
     {
         eventSystem = EventSystem.current;
         graphicRaycaster = FindObjectOfType<GraphicRaycaster>();
+        recoveryHintButtonImage = recoveryHintButton.GetComponent<Image>();
+
+        if (heart != null)
+        {
+            heartTransform = heart.transform.GetComponent<RectTransform>();
+            anchoredPosition = heartTransform.anchoredPosition;
+            heartHeight = heartTransform.sizeDelta.y * heartTransform.localScale.y;
+            stepHeartFill = heartHeight * (100 / currentLife) / 100f;
+            heartValue = anchoredPosition.y;
+        }
+        
+        if (countHintText != null)
+        {
+            countHintText.text = currentHint.ToString();
+        }
 
         if (JsonSave.main != null)
         {
@@ -70,8 +108,9 @@ public class UIManager : MonoBehaviour
         }
         
         cam = Camera.main; 
+        cameraShake = cam.GetComponent<CameraShake>();
 
-        if (music != null && PlayerPrefs.GetString("SoundEnable") == "0")
+        if (music != null && !IsSoundsActive())
         {
             music.Pause();
         }
@@ -79,7 +118,7 @@ public class UIManager : MonoBehaviour
         {
             music.Play();
         }
-                
+        
         List<UIDifference> differenceList = new List<UIDifference>(FindObjectsOfType<UIDifference>());
         differenceList.Sort((a, b) => a.GetSerialNumber().CompareTo(b.GetSerialNumber()));
         UIDifferences = differenceList.ToArray();
@@ -94,15 +133,16 @@ public class UIManager : MonoBehaviour
 
         if (timer > 1f && endLevel)
         {
-            if (successClick > misses)
+            if (UIDifferences.Length <= currentClick)
             {
-                StartCoroutine(SuccessLevel());
+                StartCoroutine(SuccessLevel()); 
             }
             else
             {
-                StartCoroutine(FailLevel());
+                StartCoroutine(FailLevel()); 
             }
-            
+
+                       
             endLevel = false;
         }
 
@@ -120,6 +160,39 @@ public class UIManager : MonoBehaviour
         if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f && !gamePause && !IsTouchOverUI(Input.mousePosition) && allowClick)
         {
             HandleMouseClick();
+        }
+
+        if (spendBarHeart)
+        {
+            DecreaseLife();
+        }
+
+        if (recoveryHint)
+        {
+            recoveryHintTimer += Time.deltaTime;
+
+            recoveryHintButtonImage.fillAmount -= 1f / recoveryHintTime * Time.deltaTime;
+
+            if (recoveryHintTimer >= recoveryHintTime)
+            {
+                RecoverHint();
+            }
+        }
+    }
+
+    public void DecreaseLife()
+    {
+        anchoredPosition.y -= stepHeartFill;
+        heartTransform.anchoredPosition = anchoredPosition;
+
+        if (Math.Abs(anchoredPosition.y) >= currentPositionHeartFill)
+        {
+            spendBarHeart = false;
+        }
+
+        if (currentLife <= 0)
+        {
+            endLevel = true;
         }
     }
 
@@ -175,7 +248,7 @@ public class UIManager : MonoBehaviour
             playerData = JsonSave.LoadData<PlayerData>("playerData");
         }
 
-        foreach (var item in FindObjectsOfType<DestroyAfterParticles>())
+        foreach (var item in GameObject.FindGameObjectsWithTag("Effect"))
         {
             Destroy(item.gameObject);
         }
@@ -192,7 +265,7 @@ public class UIManager : MonoBehaviour
                 currentClick++;
                 hitCollider.tag = "Untagged";
 
-                if (effect != null && PlayerPrefs.GetString("SoundEnable") != "0")
+                if (effect != null && IsSoundsActive())
                 {
                     effect.Play();
                 }
@@ -201,12 +274,20 @@ public class UIManager : MonoBehaviour
 
         if (!match && errorCross != null)
         {
-            GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);            
+            GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
             playerData.misses += 1;
             misses += 1;
+            currentLife -= 1;
+            currentPositionHeartFill += stepHeartFill;
+            spendBarHeart = true;
+
+            if (cameraShake != null)
+            {
+                cameraShake.StartHitShake();
+            }
         }
 
-        if (UIDifferences.Length - 1 == currentClick)
+        if (UIDifferences.Length <= currentClick)
         {
             endLevel = true;
         }
@@ -217,6 +298,11 @@ public class UIManager : MonoBehaviour
         }        
     }
 
+    public bool IsSoundsActive()
+    {
+        return PlayerPrefs.GetString("SoundEnable") == "1";
+    }
+    
     public GameObject GetRewardObject()
     {
         return reward;
@@ -239,13 +325,22 @@ public class UIManager : MonoBehaviour
 
     IEnumerator SuccessLevel()
     {
-        yield return new WaitForSeconds(1f);
+        float finalDelay = 0f;
+
+        foreach (var item in UIDifferences)
+        {
+            item.SuccessAnimate();
+            finalDelay += 0.2f;
+            yield return new WaitForSeconds(0.2f);
+        }
+
+        yield return new WaitForSeconds(finalDelay);
         gamePause = true;
 
         if (successMenu != null)
         {
             successMenu.SetActive(true);
-        }        
+        }
     }
 
     IEnumerator FailLevel()
@@ -276,7 +371,7 @@ public class UIManager : MonoBehaviour
 
     public void SwitchSound()
     {
-        if (PlayerPrefs.GetString("SoundEnable") == "0" || PlayerPrefs.GetString("SoundEnable") == "")
+        if (!IsSoundsActive())
         {
             sounIconDisabled.SetActive(false);
             PlayerPrefs.SetString("SoundEnable", "1");
@@ -302,7 +397,7 @@ public class UIManager : MonoBehaviour
 
     public void CheckSoundIcon()
     {
-        sounIconDisabled.SetActive(PlayerPrefs.GetString("SoundEnable") == "0");
+        sounIconDisabled.SetActive(!IsSoundsActive());
     }
 
     public void StartLevel()
@@ -366,31 +461,74 @@ public class UIManager : MonoBehaviour
 
     public void GetHint()
     {
-        foreach (var item in FindObjectsOfType<DestroyAfterParticles>())
+        if (currentHint > 0)
         {
-            Destroy(item.gameObject);
-        }
-
-        foreach (var item in FindObjectsOfType<Difference>())
-        {
-            if (!item.IsActive())
+            foreach (var item in FindObjectsOfType<DestroyAfterParticles>())
             {
-                if (JsonSave.main != null)
-                {
-                    playerData = JsonSave.LoadData<PlayerData>("playerData");
-                    playerData.tips += 1;
-                    JsonSave.SaveData(playerData, "playerData");
-                }
+                Destroy(item.gameObject);
+            }
 
-                if (HintEffect != null)
+            foreach (var item in FindObjectsOfType<Difference>())
+            {
+                if (!item.IsActive())
                 {
-                    Instantiate(HintEffect, item.transform.position, Quaternion.identity);
-                    Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity);
+                    if (JsonSave.main != null)
+                    {
+                        playerData = JsonSave.LoadData<PlayerData>("playerData");
+                        playerData.tips += 1;
+                        JsonSave.SaveData(playerData, "playerData");
+                    }
+
+                    if (HintEffect != null)
+                    {
+                        Instantiate(HintEffect, item.transform.position, Quaternion.identity);
+                        Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity);
+                    }
+                    
+                    break;
                 }
-                
-                break;
             }
         }
+
+        currentHint -= 1;
+
+        if (countHintText != null)
+        {
+            countHintText.text = currentHint.ToString();
+        }
+
+        if (currentHint == 0)
+        {
+            recoveryHintButton.SetActive(true);
+            recoveryHint = true;
+            CountHint.SetActive(false);
+        }
+    }
+
+    public void OpenHintPopup()
+    {
+        hintMenu.SetActive(true);
+        gamePause = true;
+        Time.timeScale = 0f;
+    }
+
+    public void GetHintForAd()
+    {
+        RecoverHint();
+    }
+
+    void RecoverHint()
+    {
+        currentHint += 1;
+        recoveryHintTimer = 0f;
+        recoveryHintButtonImage.fillAmount = 1f;
+        recoveryHintButton.SetActive(false);
+        CountHint.SetActive(true);
+        countHintText.text = currentHint.ToString();
+        recoveryHint = false;
+        hintMenu.SetActive(false);
+        gamePause = false;
+        Time.timeScale = 1f;
     }
 
     public void SkipLevel()

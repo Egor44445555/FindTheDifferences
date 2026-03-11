@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0f7f146bc58ee0649a723129bc3596f4
+guid: 58d166e18a561fd47b0afdca706af158
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1256577582931465693
-    second: SuccessMarker_0
+      213: 5585235101267928744
+    second: Hint_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -98,7 +98,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: WebGL
-    maxTextureSize: 1024
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: 47
     textureCompression: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SuccessMarker_0
+      name: Hint_0
       rect:
         serializedVersion: 2
-        x: 30
+        x: 21
         y: 3
-        width: 1162
-        height: 642
+        width: 54
+        height: 88
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dd5595f67a2407110800000000000000
-      internalID: 1256577582931465693
+      spriteID: 8a62e169bbdb28d40800000000000000
+      internalID: 5585235101267928744
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      SuccessMarker_0: 1256577582931465693
+      Hint_0: 5585235101267928744
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

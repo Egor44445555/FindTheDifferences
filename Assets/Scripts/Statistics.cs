@@ -11,6 +11,11 @@ public class Statistics : MonoBehaviour
     [SerializeField] TextMeshProUGUI omissions;
     [SerializeField] TextMeshProUGUI tips;
 
+    [SerializeField] TextMeshProUGUI differences;
+    [SerializeField] TextMeshProUGUI timeDifferences;
+    [SerializeField] TextMeshProUGUI time;
+    [SerializeField] TextMeshProUGUI accuracy;
+    
     PlayerData playerData;
 
     void Awake()
@@ -45,7 +50,11 @@ public class Statistics : MonoBehaviour
             points.text = playerData.points.ToString();
             misses.text = playerData.misses.ToString();
             omissions.text = playerData.omissions.ToString();
-            tips.text = playerData.tips.ToString();
+            tips.text = playerData.tips.ToString();            
+            differences.text = playerData.differences.ToString();
+            timeDifferences.text = playerData.timeDifferences.ToString();
+            time.text = playerData.time.ToString();
+            accuracy.text = playerData.accuracy.ToString();
         }
     }
 }
