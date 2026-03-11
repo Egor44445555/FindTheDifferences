@@ -86,7 +86,11 @@ public class UIManager : MonoBehaviour
     {
         eventSystem = EventSystem.current;
         graphicRaycaster = FindObjectOfType<GraphicRaycaster>();
-        recoveryHintButtonImage = recoveryHintButton.GetComponent<Image>();
+
+        if (recoveryHintButton != null)
+        {
+            recoveryHintButtonImage = recoveryHintButton.GetComponent<Image>();
+        }        
 
         if (heart != null)
         {
@@ -106,7 +110,6 @@ public class UIManager : MonoBehaviour
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
             currentLevel = playerData.currentLevel;
-            gameTimer = playerData.time;
         }
         
         cam = Camera.main; 
@@ -169,7 +172,7 @@ public class UIManager : MonoBehaviour
             DecreaseLife();
         }
 
-        if (recoveryHint)
+        if (recoveryHint && recoveryHintButtonImage != null)
         {
             recoveryHintTimer += Time.deltaTime;
 
@@ -182,8 +185,11 @@ public class UIManager : MonoBehaviour
         }
     
         gameTimer += Time.deltaTime;
-        playerData.time += gameTimer;
-        JsonSave.SaveData(playerData, "playerData");
+    }
+
+    public float GetGameTimer()
+    {
+        return gameTimer;
     }
 
     public void DecreaseLife()
@@ -554,6 +560,7 @@ public class UIManager : MonoBehaviour
         if (JsonSave.main != null)
         {
             playerData.time += gameTimer;
+            JsonSave.SaveData(playerData, "playerData");
             JsonSave.SaveData(playerData, "playerData");
         }
     }

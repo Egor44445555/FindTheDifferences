@@ -54,11 +54,15 @@ public class Statistics : MonoBehaviour
             differences.text = playerData.differences.ToString();
             timeDifferences.text = playerData.timeDifferences.ToString();            
             accuracy.text = playerData.accuracy.ToString();
-            
-            print(playerData.time);
 
-            // TimeSpan timeSpan = TimeSpan.FromSeconds(playerData.time);
-            // time.text = timeSpan.ToString(@"hh\:mm\:ss");
+            float timer = 0f;
+            if (UIManager.main != null)
+            {
+                timer += UIManager.main.GetGameTimer();
+            }
+
+            TimeSpan timeSpan = TimeSpan.FromSeconds(playerData.time + timer);
+            time.text = timeSpan.ToString(@"hh\:mm\:ss");
         }
     }
 
