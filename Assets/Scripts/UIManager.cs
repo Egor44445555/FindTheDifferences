@@ -45,6 +45,7 @@ public class UIManager : MonoBehaviour
     bool gamePause = false;
     int maxLevel = 2;
     int currentClick = 0;
+    int attemptClick = 0;
     UIDifference[] UIDifferences;
     Vector2 startPoint = new Vector2();
     float timer = 0f;
@@ -69,6 +70,7 @@ public class UIManager : MonoBehaviour
     float recoveryHintTimer = 0f;
     Image recoveryHintButtonImage;
     float gameTimer = 0f;
+    float timeDifferences = 0f;
 
     void Awake()
     {
@@ -84,6 +86,7 @@ public class UIManager : MonoBehaviour
     
     void Start()
     {
+        Time.timeScale = 1f;
         eventSystem = EventSystem.current;
         graphicRaycaster = FindObjectOfType<GraphicRaycaster>();
 
@@ -134,6 +137,11 @@ public class UIManager : MonoBehaviour
         if (endLevel)
         {
             timer += Time.deltaTime;
+        }
+
+        if (!endLevel && attemptClick > 0)
+        {
+            timeDifferences += Time.deltaTime;
         }
 
         if (timer > 1f && endLevel)
@@ -254,10 +262,19 @@ public class UIManager : MonoBehaviour
         bool match = false;
         Vector3 worldPosition = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));        
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(worldPosition, collectionRadius, itemLayer);
+        attemptClick += 1;
         
         if (JsonSave.main != null)
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
+            playerData.attempts += 1;
+
+            if (timeDifferences > playerData.timeDifferences)
+            {
+                playerData.timeDifferences = timeDifferences;
+            }
+
+            timeDifferences = 0f;
         }
 
         foreach (var item in GameObject.FindGameObjectsWithTag("Effect"))
@@ -270,12 +287,16 @@ public class UIManager : MonoBehaviour
             if (hitCollider.CompareTag(itemTag))
             {
                 match = true;      
-                hitCollider.GetComponent<Difference>().Catch();
-                playerData.attempts += 1;
-                playerData.points += 350;
+                hitCollider.GetComponent<Difference>().Catch();                
                 successClick += 1;
                 currentClick++;
                 hitCollider.tag = "Untagged";
+                
+                if (JsonSave.main != null)
+                {
+                    playerData.points += 350;
+                    playerData.differences += 1;
+                }
 
                 if (effect != null && IsSoundsActive())
                 {
@@ -287,6 +308,13 @@ public class UIManager : MonoBehaviour
         if (!match && errorCross != null)
         {
             GameObject crossObject = Instantiate(errorCross, worldPosition, Quaternion.identity);
+
+            if (!IsSoundsActive())
+            {
+                crossObject.GetComponent<AudioSource>().Stop();
+            }
+            
+
             playerData.misses += 1;
             misses += 1;
             currentLife -= 1;
@@ -415,6 +443,11 @@ public class UIManager : MonoBehaviour
     public void StartLevel()
     {
         SceneManager.LoadSceneAsync("Level" + currentLevel);
+    }
+
+    public void Restart()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
     }
 
     public void StartNextLevel()
@@ -560,7 +593,6 @@ public class UIManager : MonoBehaviour
         if (JsonSave.main != null)
         {
             playerData.time += gameTimer;
-            JsonSave.SaveData(playerData, "playerData");
             JsonSave.SaveData(playerData, "playerData");
         }
     }

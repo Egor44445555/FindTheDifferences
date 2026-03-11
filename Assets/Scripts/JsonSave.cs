@@ -47,9 +47,9 @@ public class JsonSave : MonoBehaviour
         playerData.omissions = 0;
         playerData.tips = 0;
         playerData.differences = 0;
-        playerData.timeDifferences = 0;
-        playerData.time = 0;
-        playerData.accuracy = 0;
+        playerData.timeDifferences = 0f;
+        playerData.time = 0f;
+        playerData.accuracy = 0f;
 
         SaveData(playerData, "PlayerData");
         PlayerPrefs.DeleteAll();

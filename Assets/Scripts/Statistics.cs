@@ -30,11 +30,6 @@ public class Statistics : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        CheckStatistics();
-    }
-
     void OnEnable()
     {
         CheckStatistics();
@@ -52,26 +47,27 @@ public class Statistics : MonoBehaviour
             omissions.text = playerData.omissions.ToString();
             tips.text = playerData.tips.ToString();            
             differences.text = playerData.differences.ToString();
-            timeDifferences.text = playerData.timeDifferences.ToString();            
-            accuracy.text = playerData.accuracy.ToString();
+            
+
+            if (playerData.attempts > 0)
+            {
+                accuracy.text = Math.Round((float)playerData.differences / (float)playerData.attempts * 100f).ToString() + "%";
+            }
+            else
+            {
+                accuracy.text = "0%";
+            }
 
             float timer = 0f;
+            float timerDifferences = 0f;
+
             if (UIManager.main != null)
             {
                 timer += UIManager.main.GetGameTimer();
             }
 
-            TimeSpan timeSpan = TimeSpan.FromSeconds(playerData.time + timer);
-            time.text = timeSpan.ToString(@"hh\:mm\:ss");
+            time.text = TimeSpan.FromSeconds(playerData.time + timer).ToString(@"hh\:mm\:ss");
+            timeDifferences.text = TimeSpan.FromSeconds(playerData.timeDifferences).ToString(@"mm\:ss");
         }
-    }
-
-    public static string FormatFloatToTime(float totalSeconds)
-    {
-        int hours = (int)(totalSeconds / 3600);
-        int minutes = (int)((totalSeconds % 3600) / 60);
-        int seconds = (int)(totalSeconds % 60);
-        
-        return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
     }
 }
