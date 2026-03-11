@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using TMPro;
 
@@ -10,7 +11,6 @@ public class Statistics : MonoBehaviour
     [SerializeField] TextMeshProUGUI misses;
     [SerializeField] TextMeshProUGUI omissions;
     [SerializeField] TextMeshProUGUI tips;
-
     [SerializeField] TextMeshProUGUI differences;
     [SerializeField] TextMeshProUGUI timeDifferences;
     [SerializeField] TextMeshProUGUI time;
@@ -52,9 +52,22 @@ public class Statistics : MonoBehaviour
             omissions.text = playerData.omissions.ToString();
             tips.text = playerData.tips.ToString();            
             differences.text = playerData.differences.ToString();
-            timeDifferences.text = playerData.timeDifferences.ToString();
-            time.text = playerData.time.ToString();
+            timeDifferences.text = playerData.timeDifferences.ToString();            
             accuracy.text = playerData.accuracy.ToString();
+            
+            print(playerData.time);
+
+            // TimeSpan timeSpan = TimeSpan.FromSeconds(playerData.time);
+            // time.text = timeSpan.ToString(@"hh\:mm\:ss");
         }
+    }
+
+    public static string FormatFloatToTime(float totalSeconds)
+    {
+        int hours = (int)(totalSeconds / 3600);
+        int minutes = (int)((totalSeconds % 3600) / 60);
+        int seconds = (int)(totalSeconds % 60);
+        
+        return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
     }
 }

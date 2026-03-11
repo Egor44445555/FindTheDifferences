@@ -68,6 +68,7 @@ public class UIManager : MonoBehaviour
     bool recoveryHint = false;
     float recoveryHintTimer = 0f;
     Image recoveryHintButtonImage;
+    float gameTimer = 0f;
 
     void Awake()
     {
@@ -105,6 +106,7 @@ public class UIManager : MonoBehaviour
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
             currentLevel = playerData.currentLevel;
+            gameTimer = playerData.time;
         }
         
         cam = Camera.main; 
@@ -178,6 +180,10 @@ public class UIManager : MonoBehaviour
                 RecoverHint();
             }
         }
+    
+        gameTimer += Time.deltaTime;
+        playerData.time += gameTimer;
+        JsonSave.SaveData(playerData, "playerData");
     }
 
     public void DecreaseLife()
@@ -541,5 +547,14 @@ public class UIManager : MonoBehaviour
         }
 
         StartNextLevel();
+    }
+
+    void OnDestroy()
+    {
+        if (JsonSave.main != null)
+        {
+            playerData.time += gameTimer;
+            JsonSave.SaveData(playerData, "playerData");
+        }
     }
 }
