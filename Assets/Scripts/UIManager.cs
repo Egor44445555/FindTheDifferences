@@ -24,17 +24,23 @@ public class UIManager : MonoBehaviour
     
 
     [Header("Additional components")]
+    
+    [SerializeField] Transform UIDifferenceWrapper;
+    [SerializeField] GameObject UIDifferencePrefab;
     [SerializeField] GameObject successCheckIcon;
     [SerializeField] GameObject successCheckEffect;
     [SerializeField] GameObject HintEffect;
     [SerializeField] GameObject successMarker;
     [SerializeField] GameObject reward;
     [SerializeField] GameObject errorCross;
-    [SerializeField] GameObject heart;
+    [SerializeField] Image heart;
+    [SerializeField] Sprite[] heartIcons;
     [SerializeField] GameObject recoveryHintButton;
     [SerializeField] GameObject CountHint;
     [SerializeField] TextMeshProUGUI countHintText;
     [SerializeField] float recoveryHintTime = 5f;
+
+    List<Sprite> heartIconsTemp = new List<Sprite>();
 
     Camera cam;
     CameraShake cameraShake;
@@ -43,29 +49,22 @@ public class UIManager : MonoBehaviour
     EventSystem eventSystem;
     int currentLevel = 0;
     bool gamePause = false;
-    int maxLevel = 2;
+    int maxLevel = 3;
     int currentClick = 0;
     int attemptClick = 0;
-    UIDifference[] UIDifferences;
+    List<UIDifference> UIDifferences = new List<UIDifference>();
     Vector2 startPoint = new Vector2();
     float timer = 0f;
     bool endLevel = false;
     PlayerData playerData;
     bool allowClick = true;
+    bool spendBarHeart = false;
 
     int misses = 0;
     int currentLife = 5;
     int currentHint = 3;
     int successClick = 0;
 
-    float heartValue = -100f;
-    float stepHeartFill = 0f;
-    RectTransform heartTransform;
-    float heartHeight;
-    Vector2 anchoredPosition;
-    float stepFill = 0f;
-    float currentPositionHeartFill = 0f;
-    bool spendBarHeart = false;
     bool recoveryHint = false;
     float recoveryHintTimer = 0f;
     Image recoveryHintButtonImage;
@@ -74,6 +73,8 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
+        maxLevel = SceneManager.sceneCountInBuildSettings - 1;
+
         if (main == null)
         {
             main = this;
@@ -94,15 +95,6 @@ public class UIManager : MonoBehaviour
         {
             recoveryHintButtonImage = recoveryHintButton.GetComponent<Image>();
         }        
-
-        if (heart != null)
-        {
-            heartTransform = heart.transform.GetComponent<RectTransform>();
-            anchoredPosition = heartTransform.anchoredPosition;
-            heartHeight = heartTransform.sizeDelta.y * heartTransform.localScale.y;
-            stepHeartFill = heartHeight * (100 / currentLife) / 100f;
-            heartValue = anchoredPosition.y;
-        }
         
         if (countHintText != null)
         {
@@ -126,10 +118,25 @@ public class UIManager : MonoBehaviour
         {
             music.Play();
         }
+
+        if (heartIcons.Length > 0)
+        {            
+            for (int i = heartIcons.Length - 1; -1 < i; i--)
+            {
+                heartIconsTemp.Add(heartIcons[i]);
+            }
+        }
         
-        List<UIDifference> differenceList = new List<UIDifference>(FindObjectsOfType<UIDifference>());
-        differenceList.Sort((a, b) => a.GetSerialNumber().CompareTo(b.GetSerialNumber()));
-        UIDifferences = differenceList.ToArray();
+        if (UIDifferencePrefab != null && UIDifferenceWrapper != null)
+        {
+            for (int i = 0; FindObjectsOfType<Difference>().Length / 2 > i; i++)
+            {
+                GameObject UIDifferenceObject = Instantiate(UIDifferencePrefab, UIDifferenceWrapper);
+                UIDifference UIDifferenceComponent = UIDifferenceObject.GetComponent<UIDifference>();
+                UIDifferenceComponent.SetSerialNumber(i);
+                UIDifferences.Add(UIDifferenceComponent);
+            }
+        }        
     }
 
     void Update()
@@ -144,9 +151,9 @@ public class UIManager : MonoBehaviour
             timeDifferences += Time.deltaTime;
         }
 
-        if (timer > 1f && endLevel)
+        if (timer > 0.5f && endLevel)
         {
-            if (UIDifferences.Length <= currentClick)
+            if (UIDifferences.Count <= currentClick)
             {
                 StartCoroutine(SuccessLevel()); 
             }
@@ -202,12 +209,11 @@ public class UIManager : MonoBehaviour
 
     public void DecreaseLife()
     {
-        anchoredPosition.y -= stepHeartFill;
-        heartTransform.anchoredPosition = anchoredPosition;
-
-        if (Math.Abs(anchoredPosition.y) >= currentPositionHeartFill)
+        spendBarHeart = false;
+        
+        if (heartIconsTemp.Count > 0 && heartIconsTemp.Count > currentLife && currentLife >= 0)
         {
-            spendBarHeart = false;
+            heart.sprite = heartIconsTemp[currentLife];
         }
 
         if (currentLife <= 0)
@@ -318,16 +324,15 @@ public class UIManager : MonoBehaviour
             playerData.misses += 1;
             misses += 1;
             currentLife -= 1;
-            currentPositionHeartFill += stepHeartFill;
             spendBarHeart = true;
 
-            if (cameraShake != null)
-            {
-                cameraShake.StartHitShake();
-            }
+            // if (cameraShake != null)
+            // {
+            //     cameraShake.StartHitShake();
+            // }
         }
 
-        if (UIDifferences.Length <= currentClick)
+        if (UIDifferences.Count <= currentClick)
         {
             endLevel = true;
         }
@@ -353,7 +358,7 @@ public class UIManager : MonoBehaviour
         return successMarker;
     }    
     
-    public UIDifference[] GetUIDifferences()
+    public List<UIDifference> GetUIDifferences()
     {
         return UIDifferences;
     }
@@ -440,51 +445,11 @@ public class UIManager : MonoBehaviour
         sounIconDisabled.SetActive(!IsSoundsActive());
     }
 
-    public void StartLevel()
+    public int GetintCurrentLevel()
     {
-        SceneManager.LoadSceneAsync("Level" + currentLevel);
+        return currentLevel;
     }
-
-    public void Restart()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
-    }
-
-    public void StartNextLevel()
-    {
-        if ((currentLevel + 1) <= maxLevel)
-        {
-            if (JsonSave.main != null)
-            {
-                playerData = JsonSave.LoadData<PlayerData>("playerData");
-                playerData.currentLevel += 1;
-                JsonSave.SaveData(playerData, "playerData");
-            }
-
-            SceneManager.LoadSceneAsync("Level" + (currentLevel + 1));
-        }
-        else
-        {
-            if (JsonSave.main != null)
-            {
-                playerData = JsonSave.LoadData<PlayerData>("playerData");
-                playerData.currentLevel = 0;
-                JsonSave.SaveData(playerData, "playerData");
-            }
-            
-            ToMenu();
-        }
-    }
-
-    public void ToMenu()
-    {
-        SceneManager.LoadSceneAsync("MainMenu");
-    }
-
-    public void ExitGame()
-    {
-        Application.Quit();
-    }
+    
 
     public GameObject GetSuccessCheckIcon()
     {
@@ -527,7 +492,11 @@ public class UIManager : MonoBehaviour
                     if (HintEffect != null)
                     {
                         Instantiate(HintEffect, item.transform.position, Quaternion.identity);
-                        Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity);
+
+                        if (item.GetLinkedObject() != null)
+                        {
+                            Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity);
+                        }                        
                     }
                     
                     break;
@@ -574,18 +543,6 @@ public class UIManager : MonoBehaviour
         hintMenu.SetActive(false);
         gamePause = false;
         Time.timeScale = 1f;
-    }
-
-    public void SkipLevel()
-    {
-        if (JsonSave.main != null)
-        {
-            playerData = JsonSave.LoadData<PlayerData>("playerData");
-            playerData.omissions += 1;
-            JsonSave.SaveData(playerData, "playerData");
-        }
-
-        StartNextLevel();
     }
 
     void OnDestroy()

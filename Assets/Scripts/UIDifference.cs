@@ -4,9 +4,7 @@ using UnityEngine.UI;
 public class UIDifference : MonoBehaviour
 {
     [SerializeField] Sprite successBackground;
-    [SerializeField] Sprite failBackground;
-    [SerializeField] GameObject successIcon;
-    [SerializeField] GameObject failIcon;
+    [SerializeField] Sprite[] numberIcons;
     [SerializeField] int serialNumber;
 
     bool activeDifference = false;
@@ -15,7 +13,7 @@ public class UIDifference : MonoBehaviour
     bool isAnimationPlaying = false;
     string currentAnimation = "Active";
 
-    void Start()
+    void Awake()
     {
         image = GetComponent<Image>();
         anim = GetComponent<Animator>();  
@@ -39,17 +37,21 @@ public class UIDifference : MonoBehaviour
         if (success)
         {
             image.sprite = successBackground;
-            successIcon.SetActive(true);
-        }
-        else
-        {
-            image.sprite = failBackground;
-            failIcon.SetActive(true);
         }
 
         SuccessAnimate();
         
         activeDifference = true;
+    }
+
+    public void SetSerialNumber(int _serialNumber)
+    {
+        serialNumber = _serialNumber;
+
+        if (numberIcons.Length - 1 > 0 && numberIcons.Length - 1 >= serialNumber && serialNumber >= 0 && image != null)
+        {
+            image.sprite = numberIcons[serialNumber];            
+        }
     }
 
     public int GetSerialNumber()
