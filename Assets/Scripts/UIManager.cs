@@ -73,6 +73,8 @@ public class UIManager : MonoBehaviour
     float gameTimer = 0f;
     float timeDifferences = 0f;
 
+    bool aboveUI = false;
+
     void Awake()
     {
         maxLevel = SceneManager.sceneCountInBuildSettings - 1;
@@ -188,9 +190,24 @@ public class UIManager : MonoBehaviour
         {
             startPoint = Input.mousePosition;
             allowClick = !gamePause ? true : false;
+
+            PointerEventData pointerData = new PointerEventData(EventSystem.current);
+            pointerData.position = Input.mousePosition;
+            
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointerData, results);
+            
+            aboveUI = results.Count > 0;
         }
 
-        if (Input.GetMouseButtonUp(0) && Vector2.Distance(startPoint, Input.mousePosition) < 10f && !gamePause && !IsTouchOverUI(Input.mousePosition) && allowClick)
+        if (
+            Input.GetMouseButtonUp(0) && 
+            Vector2.Distance(startPoint, Input.mousePosition) < 10f && 
+            !gamePause && 
+            !IsTouchOverUI(Input.mousePosition) && 
+            allowClick && 
+            !aboveUI
+        )
         {
             HandleMouseClick();
         }
@@ -333,7 +350,6 @@ public class UIManager : MonoBehaviour
                 crossObject.GetComponent<AudioSource>().Stop();
             }
             
-
             playerData.misses += 1;
             misses += 1;
             currentLife -= 1;
@@ -467,6 +483,7 @@ public class UIManager : MonoBehaviour
     {
         selectAvatarWindow.transform.localScale = new Vector3(1, 1, 1);
         selectAvatarWindow.SetActive(true);
+        gamePause = true;
     }
     
     public GameObject GetSelectAvatarWindow()
@@ -494,6 +511,7 @@ public class UIManager : MonoBehaviour
         pointerEventData = new PointerEventData(eventSystem) { position = _position };
         List<RaycastResult> results = new List<RaycastResult>();
         graphicRaycaster.Raycast(pointerEventData, results);
+
         return results.Count > 0;
     }
 

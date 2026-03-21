@@ -17,6 +17,7 @@ public class AvatarInnerSlider : MonoBehaviour
     {
         if (UIManager.main != null)
         {
+            UIManager.main.SetUnpauseGame();
             playerData = JsonSave.LoadData<PlayerData>("playerData");
             playerData.avatar = image.sprite.name;
             PlayerPrefs.SetString("Avatar", image.sprite.name);

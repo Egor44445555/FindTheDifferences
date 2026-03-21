@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4175583397906563466}
   - component: {fileID: 164821129436137590}
   - component: {fileID: 412364289867165785}
+  - component: {fileID: 5389176551173082865}
   m_Layer: 0
   m_Name: Star
   m_TagString: Untagged
@@ -205,3 +206,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5389176551173082865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7281211902900808818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b080a618e7079d24f89f12a71e6b6a50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Destroy
+  time: 2
