@@ -18,6 +18,7 @@ public class PlayerData
     public float timeDifferences;
     public float time;
     public float accuracy;
+    public string avatar;
 }
 
 public class JsonSave : MonoBehaviour
@@ -38,7 +39,7 @@ public class JsonSave : MonoBehaviour
 
     public void ResetPlayerData()
     {
-        PlayerData playerData = JsonSave.LoadData<PlayerData>("playerData");
+        PlayerData playerData = LoadData<PlayerData>("playerData");
 
         playerData.currentLevel = 0;
         playerData.attempts = 0;
@@ -50,6 +51,7 @@ public class JsonSave : MonoBehaviour
         playerData.timeDifferences = 0f;
         playerData.time = 0f;
         playerData.accuracy = 0f;
+        playerData.avatar = "";
 
         SaveData(playerData, "PlayerData");
         PlayerPrefs.DeleteAll();

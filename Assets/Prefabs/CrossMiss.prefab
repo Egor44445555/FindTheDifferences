@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5485000607109743075}
   - component: {fileID: 2771242704439666291}
   - component: {fileID: -2942222927721751476}
+  - component: {fileID: 789484097867309970}
   - component: {fileID: 5315098853394052601}
   m_Layer: 0
   m_Name: CrossMiss
@@ -106,6 +107,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Destroy
   time: 1
+--- !u!114 &789484097867309970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3682769003917628256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d2a9719904733a459bf2c4206aeee13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossShake
+  hitShake:
+    duration: 0.8
+    magnitude: 0.2
+    frequency: 10
 --- !u!82 &5315098853394052601
 AudioSource:
   m_ObjectHideFlags: 0

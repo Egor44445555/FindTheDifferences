@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using System.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,8 +24,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] AudioSource effect;
     
 
-    [Header("Additional components")]
-    
+    [Header("Additional components")]    
     [SerializeField] Transform UIDifferenceWrapper;
     [SerializeField] GameObject UIDifferencePrefab;
     [SerializeField] GameObject successCheckIcon;
@@ -39,6 +39,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject CountHint;
     [SerializeField] TextMeshProUGUI countHintText;
     [SerializeField] float recoveryHintTime = 5f;
+    [SerializeField] GameObject selectAvatarWindow;
+    [SerializeField] Image currentAvatar;
 
     List<Sprite> heartIconsTemp = new List<Sprite>();
 
@@ -105,6 +107,17 @@ public class UIManager : MonoBehaviour
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
             currentLevel = playerData.currentLevel;
+
+            Sprite[] allAvatars = Resources.LoadAll<Sprite>("Avatars");
+
+            foreach(Sprite avatar in allAvatars)
+            {
+                if (avatar.name == PlayerPrefs.GetString("Avatar"))
+                {
+                    currentAvatar.sprite = avatar;
+                    break;
+                }                
+            }
         }
         
         cam = Camera.main; 
@@ -449,7 +462,22 @@ public class UIManager : MonoBehaviour
     {
         return currentLevel;
     }
+
+    public void OpenSelectAvatarWindow()
+    {
+        selectAvatarWindow.transform.localScale = new Vector3(1, 1, 1);
+        selectAvatarWindow.SetActive(true);
+    }
     
+    public GameObject GetSelectAvatarWindow()
+    {
+        return selectAvatarWindow;
+    }
+
+    public Image GetCurrentAvatar()
+    {
+        return currentAvatar;
+    }
 
     public GameObject GetSuccessCheckIcon()
     {

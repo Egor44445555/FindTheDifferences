@@ -33,11 +33,11 @@ public class Menu : MonoBehaviour
         {
             if (PlayerPrefs.GetString("SoundEnable") == "1")
             {
-                music.Pause();
+                music.Play();
             }
             else
             {
-                music.Play();
+                music.Pause();
             }
         }       
     }

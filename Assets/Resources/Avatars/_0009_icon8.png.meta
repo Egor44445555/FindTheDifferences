@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ef9e54182bcb5b244bb7dda51da31d95
+guid: 1e86922bddf7b4746bc28dd85f99ad9c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5765001656443474426
-    second: FrameBackground_0
+      213: -5184593406027270574
+    second: _0009_icon8_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -98,7 +98,7 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: WebGL
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: 47
     textureCompression: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: FrameBackground_0
+      name: _0009_icon8_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 913
-        height: 922
+        width: 255
+        height: 256
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: af11ad55676610050800000000000000
-      internalID: 5765001656443474426
+      spriteID: 25679e034cf9c08b0800000000000000
+      internalID: -5184593406027270574
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      FrameBackground_0: 5765001656443474426
+      _0009_icon8_0: -5184593406027270574
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
