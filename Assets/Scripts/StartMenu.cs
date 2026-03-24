@@ -14,5 +14,8 @@ public class StartMenu : MonoBehaviour
         {
             statisticsObject.SetActive(true);
         }
+
+        playerData.availableHints = 3;
+        JsonSave.SaveData(playerData, "playerData");
     }
 }

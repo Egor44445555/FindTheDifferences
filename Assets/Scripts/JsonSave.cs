@@ -19,6 +19,7 @@ public class PlayerData
     public float time;
     public float accuracy;
     public string avatar;
+    public int availableHints;
 }
 
 public class JsonSave : MonoBehaviour

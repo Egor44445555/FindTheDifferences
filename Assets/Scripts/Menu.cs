@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using TMPro;
+using System.Collections;
 
 public class Menu : MonoBehaviour
 {
@@ -39,13 +40,18 @@ public class Menu : MonoBehaviour
             {
                 music.Pause();
             }
-        }
-        
-        print(playerData.currentLevel);
+        }        
     }
     
     public void StartLevel()
     {
+        StartCoroutine(StartLevelTimer());
+    }
+
+    IEnumerator StartLevelTimer()
+    {
+        yield return new WaitForSeconds(0.4f);
+
         if (System.Array.Exists(availableScenes, scene => scene == "Level" + currentLevel))
         {
             SceneManager.LoadSceneAsync("Level" + currentLevel);
@@ -69,6 +75,7 @@ public class Menu : MonoBehaviour
         if (JsonSave.main != null)
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
+            playerData.time += UIManager.main.GetGameTimer();
             playerData.currentLevel = existNewLevel ? currentLevel + 1 : 0;
             JsonSave.SaveData(playerData, "playerData");
         }

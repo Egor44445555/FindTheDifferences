@@ -103,11 +103,6 @@ public class UIManager : MonoBehaviour
         if (recoveryHintButton != null)
         {
             recoveryHintButtonImage = recoveryHintButton.GetComponent<Image>();
-        }        
-        
-        if (countHintText != null)
-        {
-            countHintText.text = currentHint.ToString();
         }
 
         if (JsonSave.main != null)
@@ -126,6 +121,12 @@ public class UIManager : MonoBehaviour
                     currentAvatar.sprite = avatar;
                     break;
                 }                
+            }
+
+            if (countHintText != null)
+            {
+                currentHint = playerData.availableHints;
+                countHintText.text = currentHint.ToString();
             }
         }
         
@@ -574,19 +575,25 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        currentHint -= 1;
-
-        if (countHintText != null)
+        if (currentHint > 0)
         {
-            countHintText.text = currentHint.ToString();
-        }
+            currentHint -= 1;
 
-        if (currentHint == 0)
+            if (countHintText != null)
+            {
+                countHintText.text = currentHint.ToString();
+            }
+        }        
+
+        if (currentHint <= 0)
         {
             recoveryHintButton.SetActive(true);
             recoveryHint = true;
             CountHint.SetActive(false);
         }
+
+        playerData.availableHints = currentHint;
+        JsonSave.SaveData(playerData, "playerData");
     }
 
     public void OpenHintPopup()
@@ -613,14 +620,5 @@ public class UIManager : MonoBehaviour
         hintMenu.SetActive(false);
         gamePause = false;
         Time.timeScale = 1f;
-    }
-
-    void OnDestroy()
-    {
-        if (JsonSave.main != null)
-        {
-            playerData.time += gameTimer;
-            JsonSave.SaveData(playerData, "playerData");
-        }
     }
 }
