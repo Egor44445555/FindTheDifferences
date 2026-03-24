@@ -22,6 +22,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject sounIconDisabled;
     [SerializeField] AudioSource music;
     [SerializeField] AudioSource effect;
+    [SerializeField] AudioSource fanfare;
+    [SerializeField] GameObject firework;
+
+    List<GameObject> fireworks = new List<GameObject>();
     
 
     [Header("Additional components")]    
@@ -41,6 +45,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] float recoveryHintTime = 5f;
     [SerializeField] GameObject selectAvatarWindow;
     [SerializeField] Image currentAvatar;
+    [SerializeField] TextMeshProUGUI currentLevelText;
 
     List<Sprite> heartIconsTemp = new List<Sprite>();
 
@@ -110,6 +115,8 @@ public class UIManager : MonoBehaviour
             playerData = JsonSave.LoadData<PlayerData>("playerData");
             currentLevel = playerData.currentLevel;
 
+            currentLevelText.text = "Ур. " + UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex.ToString();
+
             Sprite[] allAvatars = Resources.LoadAll<Sprite>("Avatars");
 
             foreach(Sprite avatar in allAvatars)
@@ -151,7 +158,13 @@ public class UIManager : MonoBehaviour
                 UIDifferenceComponent.SetSerialNumber(i);
                 UIDifferences.Add(UIDifferenceComponent);
             }
-        }        
+        }
+
+        foreach (GameObject item in GameObject.FindGameObjectsWithTag("Firework"))
+        {
+            fireworks.Add(item);
+            item.SetActive(false);
+        }
     }
 
     void Update()
@@ -414,6 +427,17 @@ public class UIManager : MonoBehaviour
         if (successMenu != null)
         {
             successMenu.SetActive(true);
+        }
+
+        foreach (GameObject item in fireworks)
+        {
+            item.SetActive(true);
+        }
+
+        if (fanfare != null && IsSoundsActive())
+        {
+            music.Stop();
+            fanfare.Play();
         }
     }
 

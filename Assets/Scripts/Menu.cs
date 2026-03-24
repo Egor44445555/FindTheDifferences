@@ -39,7 +39,9 @@ public class Menu : MonoBehaviour
             {
                 music.Pause();
             }
-        }       
+        }
+        
+        print(playerData.currentLevel);
     }
     
     public void StartLevel()
@@ -63,7 +65,7 @@ public class Menu : MonoBehaviour
     {
         string sceneName = "Level" + (currentLevel + 1);
         bool existNewLevel = System.Array.Exists(availableScenes, scene => scene == sceneName);
-
+        
         if (JsonSave.main != null)
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
