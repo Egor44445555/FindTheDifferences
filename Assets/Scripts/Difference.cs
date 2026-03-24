@@ -12,7 +12,7 @@ public class Difference : MonoBehaviour
         {
             if (UIManager.main != null)
             {
-                Instantiate(UIManager.main.GetSuccessMarker(), transform.position, Quaternion.identity);
+                Instantiate(UIManager.main.GetSuccessMarker(), transform.position, Quaternion.identity, transform);
                 Instantiate(UIManager.main.GetSuccessCheckEffect(), transform.position, Quaternion.identity);
 
                 if (UIManager.main != null)
@@ -28,7 +28,7 @@ public class Difference : MonoBehaviour
 
                 if (linkedObject != null)
                 {
-                    Instantiate(UIManager.main.GetSuccessMarker(), linkedObject.transform.position, Quaternion.identity);
+                    Instantiate(UIManager.main.GetSuccessMarker(), linkedObject.transform.position, Quaternion.identity, linkedObject.transform);
                     Instantiate(UIManager.main.GetSuccessCheckEffect(), linkedObject.transform.position, Quaternion.identity);
                     linkedObject.GetComponent<Difference>().CatchActive();
                 }                
