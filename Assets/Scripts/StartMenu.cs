@@ -8,8 +8,9 @@ public class StartMenu : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1f;
         playerData = JsonSave.LoadData<PlayerData>("playerData");
-        
+                
         if (playerData.attempts > 0)
         {
             statisticsObject.SetActive(true);

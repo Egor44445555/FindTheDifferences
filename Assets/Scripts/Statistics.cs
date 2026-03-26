@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class Statistics : MonoBehaviour
@@ -17,6 +18,7 @@ public class Statistics : MonoBehaviour
     [SerializeField] TextMeshProUGUI accuracy;
     
     PlayerData playerData;
+    string[] availableScenes;
 
     void Awake()
     {
@@ -27,6 +29,15 @@ public class Statistics : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+
+        int currentSceneIndex = UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+        availableScenes = new string[SceneManager.sceneCountInBuildSettings];
+        
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            availableScenes[i] = System.IO.Path.GetFileNameWithoutExtension(scenePath);
         }
     }
 
@@ -40,7 +51,16 @@ public class Statistics : MonoBehaviour
         if (JsonSave.main != null)
         {
             playerData = JsonSave.LoadData<PlayerData>("playerData");
-            currentLevel.text = playerData.currentLevel.ToString();
+
+            if (playerData.attempts == 0)
+            {
+                currentLevel.text = 0.ToString();
+            }
+            else
+            {
+                currentLevel.text = playerData.finishLevel.ToString();
+            }
+            
             attempts.text = playerData.attempts.ToString();
             points.text = playerData.points.ToString();
             misses.text = playerData.misses.ToString();

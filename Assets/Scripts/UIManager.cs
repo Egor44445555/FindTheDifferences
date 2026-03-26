@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour
 
     List<Sprite> heartIconsTemp = new List<Sprite>();
 
+    Vector2 selectAvatarWindowOriginalPosition;
     Camera cam;
     CameraShake cameraShake;
     GraphicRaycaster graphicRaycaster;
@@ -100,6 +101,11 @@ public class UIManager : MonoBehaviour
         eventSystem = EventSystem.current;
         graphicRaycaster = FindObjectOfType<GraphicRaycaster>();
 
+        if (selectAvatarWindow != null)
+        {
+            selectAvatarWindowOriginalPosition = selectAvatarWindow.transform.position;
+        }
+        
         if (recoveryHintButton != null)
         {
             recoveryHintButtonImage = recoveryHintButton.GetComponent<Image>();
@@ -368,11 +374,6 @@ public class UIManager : MonoBehaviour
             misses += 1;
             currentLife -= 1;
             spendBarHeart = true;
-
-            // if (cameraShake != null)
-            // {
-            //     cameraShake.StartHitShake();
-            // }
         }
 
         if (UIDifferences.Count <= currentClick)
@@ -388,7 +389,7 @@ public class UIManager : MonoBehaviour
 
     public bool IsSoundsActive()
     {
-        return PlayerPrefs.GetString("SoundEnable") == "1";
+        return PlayerPrefs.GetString("SoundEnable") == "1" || PlayerPrefs.GetString("SoundEnable") == "";
     }
     
     public GameObject GetRewardObject()
@@ -506,14 +507,14 @@ public class UIManager : MonoBehaviour
 
     public void OpenSelectAvatarWindow()
     {
-        selectAvatarWindow.transform.localScale = new Vector3(1, 1, 1);
-        selectAvatarWindow.SetActive(true);
+        selectAvatarWindow.transform.position = transform.position;
         gamePause = true;
     }
-    
-    public GameObject GetSelectAvatarWindow()
+
+    public void CloseSelectAvatarWindow()
     {
-        return selectAvatarWindow;
+        selectAvatarWindow.transform.position = selectAvatarWindowOriginalPosition;
+        gamePause = false;
     }
 
     public Image GetCurrentAvatar()
@@ -544,6 +545,8 @@ public class UIManager : MonoBehaviour
     {
         if (currentHint > 0)
         {
+            ImageTouchMove.main.SetMaxZoom();
+
             foreach (var item in FindObjectsOfType<DestroyAfterParticles>())
             {
                 Destroy(item.gameObject);
@@ -562,28 +565,25 @@ public class UIManager : MonoBehaviour
 
                     if (HintEffect != null)
                     {
-                        Instantiate(HintEffect, item.transform.position, Quaternion.identity);
+                        Instantiate(HintEffect, item.transform.position, Quaternion.identity, item.transform);
 
                         if (item.GetLinkedObject() != null)
                         {
-                            Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity);
+                            Instantiate(HintEffect, item.GetLinkedObject().transform.position, Quaternion.identity, item.GetLinkedObject().transform);
                         }                        
                     }
                     
                     break;
                 }
             }
-        }
 
-        if (currentHint > 0)
-        {
             currentHint -= 1;
 
             if (countHintText != null)
             {
                 countHintText.text = currentHint.ToString();
             }
-        }        
+        }      
 
         if (currentHint <= 0)
         {

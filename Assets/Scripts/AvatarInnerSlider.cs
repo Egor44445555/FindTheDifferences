@@ -31,6 +31,6 @@ public class AvatarInnerSlider : MonoBehaviour
     IEnumerator CloseWindow()
     {
         yield return new WaitForSeconds(0.2f);
-        UIManager.main.GetSelectAvatarWindow().SetActive(false);
+        UIManager.main.CloseSelectAvatarWindow();
     }
 }

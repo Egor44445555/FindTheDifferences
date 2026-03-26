@@ -32,7 +32,7 @@ public class Menu : MonoBehaviour
 
         if (music != null)
         {
-            if (PlayerPrefs.GetString("SoundEnable") == "1")
+            if (PlayerPrefs.GetString("SoundEnable") == "1" || PlayerPrefs.GetString("SoundEnable") == "")
             {
                 music.Play();
             }
@@ -77,6 +77,7 @@ public class Menu : MonoBehaviour
             playerData = JsonSave.LoadData<PlayerData>("playerData");
             playerData.time += UIManager.main.GetGameTimer();
             playerData.currentLevel = existNewLevel ? currentLevel + 1 : 0;
+            playerData.finishLevel = currentLevel + 1;
             JsonSave.SaveData(playerData, "playerData");
         }
 

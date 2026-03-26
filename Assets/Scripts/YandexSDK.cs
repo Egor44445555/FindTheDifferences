@@ -1,5 +1,5 @@
 using UnityEngine;
-using YG;
+// using YG;
 
 public class YandexSDK : MonoBehaviour
 {
@@ -19,7 +19,8 @@ public class YandexSDK : MonoBehaviour
 
     void Start()
     {
-        YG2.GameReadyAPI();
+        print("GameReadyAPI");
+        // YG2.GameReadyAPI();
     }
 
     void OnDestroy()

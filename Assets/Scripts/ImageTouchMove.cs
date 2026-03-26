@@ -118,7 +118,6 @@ public class ImageTouchMove : MonoBehaviour
 
         float scroll = Input.mouseScrollDelta.y;
         float currentScroll = Mathf.Clamp(Image1.transform.localScale.x + scroll * zoomSpeedMouse, minZoom, maxZoom);
-
         if (scroll != 0 && GameObject.FindGameObjectWithTag("Popup") == null)
         {
             Vector3 oldPos1 = Image1.transform.position;
@@ -130,6 +129,20 @@ public class ImageTouchMove : MonoBehaviour
             Image1.transform.position = ClampPosition(Image1, Mask1, oldPos1);
             Image2.transform.position = ClampPosition(Image2, Mask2, oldPos2);
         }
+    }
+
+    public void SetMaxZoom()
+    {
+        float currentScroll = Mathf.Clamp(Image1.transform.localScale.x + minZoom * zoomSpeedMouse, minZoom, maxZoom);
+
+        Vector3 oldPos1 = Image1.transform.position;
+        Vector3 oldPos2 = Image2.transform.position;
+
+        Image1.transform.localScale = new Vector3(minZoom, minZoom, minZoom);
+        Image2.transform.localScale = new Vector3(minZoom, minZoom, minZoom);
+
+        Image1.transform.position = ClampPosition(Image1, Mask1, oldPos1);
+        Image2.transform.position = ClampPosition(Image2, Mask2, oldPos2);
     }
 
     Vector3 ClampPosition(RectTransform image, RectTransform mask, Vector3 desiredPosition)
